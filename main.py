@@ -1,6 +1,11 @@
 #H I! 
 # helo :3
 import pygame
+import PySimpleGUI as gui
+
+# gui.theme() # set pysimplegui theme
+
+pygame.init()
 
 MAX_ITERATE = 30
 CONVERGENCE_CUTOFF = 250
@@ -14,14 +19,8 @@ def converge(c):
             break
 
     return abs(z) <= 5
-        
-def pixel_to_coord(x, y):
-    return -1
 
-def zoom_to_mouse(x, y):
-    pygame.mouse.get_pos[0] #x
-
-def make_view(size, upper_x = 1, upper_i = 1, displacement = 2):
+def make_view(window, size, upper_x = 1, upper_i = 1, displacement = 2):
     view = [[0 for i in range(size)] for j in range(size)]
 
     for i in range(0, size):
@@ -29,29 +28,63 @@ def make_view(size, upper_x = 1, upper_i = 1, displacement = 2):
             if(converge(complex(upper_x - displacement/size * j, upper_i - displacement/size * i))):
                 window.set_at((SIZE-1-j, i), (0, 0, 0))
 
-pygame.init()
 
-window = pygame.display.set_mode([SIZE, SIZE])
 
-x = 1
-y = 1
+def display_mandelbrot():
 
-run = True
-while run:
+    window = pygame.display.set_mode([SIZE, SIZE])
 
-    zoom_factor = 0.75
-    inv_factor = 0.25
+    x = 1
+    y = 1
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
+    run = True
+    while run:
 
-    window.fill((255, 255, 255))
+        zoom_factor = 0.75
+        inv_factor = 0.25
 
-    make_view(SIZE, 1, 1, 2)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
 
-    #(2.5 * zoom_factor)
+        window.fill((255, 255, 255))
 
-    #zoom_to_mouse(x, y)
+        make_view(window, SIZE, 1, 1, 2)
 
-    pygame.display.update()
+        pygame.display.update()
+
+def display_gui():
+    # layout of the menubar at top of gui
+    menu = [
+        ["&Help", ["&Mandelbrots"]],
+        ["&About"]
+    ]
+
+    # actual layout of the main gui
+    layout = [
+        [gui.Menu(menu)],
+        [gui.Text("Resolution: "), gui.Input(size = (5, 1), key="_RES_")],
+        [gui.Text("i-coordinate: "), gui.Input(size = (5, 1), key="_ICORD_")],
+        [gui.Text("x-coordinate: "), gui.Input(size = (5, 1), key="_XCORD_")],
+        [gui.Text("Displacement: "), gui.Input(size = (5, 1), key="_DIS_")],
+    ]
+
+    sg_window = gui.Window("Mandelbrots!", layout)
+
+    run = True
+    while run:
+        event, values = sg_window.read()
+        if event in (gui.WIN_CLOSED, 'Exit'):
+            break
+
+        if event == "Mandelbrots":
+            print("help feature")
+        elif event == "About":
+            print("about feature")
+
+    sg_window.close()
+
+
+
+display_gui()
+#display_mandelbrot()
