@@ -1,8 +1,8 @@
 import pygame
 
-MAX_ITERATE = 150
-CONVERGENCE_CUTOFF = 50
-SIZE = 500
+MAX_ITERATE = 200
+CONVERGENCE_CUTOFF = 150
+SIZE = 750
 
 def converge(c):
     z = 0
@@ -11,7 +11,7 @@ def converge(c):
         if(abs(z) > CONVERGENCE_CUTOFF):
             break
 
-    return abs(z) <= 5
+    return abs(z) <= 2
 
 def pixel_to_zoom(center_coord, bound, zoom_factor = 1, size = SIZE):
     displacement = bound[2]/zoom_factor
@@ -36,7 +36,7 @@ pygame.init()
 
 window = pygame.display.set_mode([SIZE, SIZE])
 
-bound = (2, 2, 4)
+bound = pixel_to_zoom((469.5, 472.95), (2, 2, 4), 1)
 counter = 0
 
 run = True
@@ -51,8 +51,9 @@ while run:
     make_view(bound, SIZE)
 
     # 475 with 750 goes crazy
-    if(counter <= 200):
-        bound = pixel_to_zoom((500, 500), bound, SIZE, 2)
+    if(counter <= 500):
+        bound = pixel_to_zoom((SIZE/2, SIZE/2), bound, 1.1)
 
     pygame.display.update()
+    pygame.image.save(window, str(counter) + ".jpeg")
     counter = counter + 1
