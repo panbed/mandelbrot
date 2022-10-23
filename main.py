@@ -2,7 +2,7 @@ import pygame
 
 MAX_ITERATE = 200
 CONVERGENCE_CUTOFF = 150
-SIZE = 750
+SIZE = 1000
 
 def converge(c):
     z = 0
@@ -24,7 +24,7 @@ def pixel_to_zoom(center_coord, bound, zoom_factor = 1, size = SIZE):
 def zoom_to_mouse(x, y):
     return (pygame.mouse.get_pos[0], pygame.mouse.get_pos[1])
 
-def make_view(bound, size = SIZE):
+def make_view(window, bound = (2, 2, 4), size = SIZE):
     view = [[0 for i in range(size)] for j in range(size)]
 
     for i in range(0, size):
@@ -32,28 +32,32 @@ def make_view(bound, size = SIZE):
             if(converge(complex(bound[0] - bound[2]/size * j, bound[1] - bound[2]/size * i))):
                 window.set_at((SIZE-1-j, i), (0, 0, 0))
 
-pygame.init()
+def render_mandelbrot(zoom_coord, frame_count, zoom = 1.1, init_bound = (2, 2, 4)):
+    pygame.init()
+    
+    window = pygame.display.set_mode([SIZE, SIZE])
+    bound = pixel_to_zoom(zoom_coord, init_bound, 1)
+    
+    counter = 0
+    run = True
 
-window = pygame.display.set_mode([SIZE, SIZE])
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
 
-bound = pixel_to_zoom((469.5, 472.95), (2, 2, 4), 1)
-counter = 0
+        window.fill((255, 255, 255))
 
-run = True
-while run:
+        make_view(window, bound, SIZE)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if(counter <= frame_count):
+            bound = pixel_to_zoom((SIZE/2, SIZE/2), bound, zoom)
+
+            pygame.display.update()
+            pygame.image.save(window, str(counter) + ".jpeg")
+
+            counter = counter + 1
+        else:
             run = False
 
-    window.fill((255, 255, 255))
-
-    make_view(bound, SIZE)
-
-    # 475 with 750 goes crazy
-    if(counter <= 500):
-        bound = pixel_to_zoom((SIZE/2, SIZE/2), bound, 1.1)
-
-    pygame.display.update()
-    pygame.image.save(window, str(counter) + ".jpeg")
-    counter = counter + 1
+render_mandelbrot((246.896/750 * 1000, 230.11/750 * 1000), 500, 1.1, (1, 1, 2))
